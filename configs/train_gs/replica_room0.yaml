@@ -1,0 +1,6 @@
+scene:
+  name: "room0"
+  data_dir: "data/replica/room0"
+  type: "replica"
+train_gs:
+  data_factor: 4

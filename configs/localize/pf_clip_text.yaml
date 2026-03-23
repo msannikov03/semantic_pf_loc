@@ -1,0 +1,3 @@
+observation:
+  type: "clip_text"
+  text_query: "a desk with a computer monitor"

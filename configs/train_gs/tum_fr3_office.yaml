@@ -1,0 +1,6 @@
+scene:
+  name: "fr3_office"
+  data_dir: "data/tum/rgbd_dataset_freiburg3_long_office_household"
+  type: "tum"
+train_gs:
+  data_factor: 2

@@ -1,0 +1,14 @@
+torch>=2.1.0
+gsplat>=1.0.0
+pypose>=0.6.0
+open-clip-torch>=2.24.0
+pytorch-msssim>=1.0.0
+omegaconf>=2.3.0
+numpy
+scipy
+matplotlib
+tqdm
+Pillow
+plyfile
+pandas
+tensorboard

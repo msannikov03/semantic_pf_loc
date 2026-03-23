@@ -1,0 +1,6 @@
+scene:
+  name: "fr2_xyz"
+  data_dir: "data/tum/rgbd_dataset_freiburg2_xyz"
+  type: "tum"
+train_gs:
+  data_factor: 2

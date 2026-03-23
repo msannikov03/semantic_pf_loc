@@ -1,0 +1,6 @@
+scene:
+  name: "office0"
+  data_dir: "data/replica/office0"
+  type: "replica"
+train_gs:
+  data_factor: 4

@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.so
+
+# Data and checkpoints (too large for git)
+data/
+checkpoints/
+checkpoints_depth/
+*.ckpt
+
+# Environment
+.env
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Torch cache
+*.pt
+!results/**/*.pt
+CLAUDE.md

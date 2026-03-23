@@ -1,0 +1,59 @@
+scene:
+  name: ""
+  data_dir: ""
+  type: "tum"
+
+train_gs:
+  max_steps: 50000
+  sh_degree: 3
+  init_num_gaussians: 200000
+  ssim_lambda: 0.2
+  densify_start: 500
+  densify_stop: 15000
+  densify_every: 100
+  lr_means: 1.6e-4
+  lr_scales: 5.0e-3
+  lr_opacities: 5.0e-2
+  lr_sh: 2.5e-3
+  lr_quats: 1.0e-3
+  data_factor: 2
+  batch_size: 1
+  near_plane: 0.01
+  far_plane: 100.0
+
+particle_filter:
+  num_particles: 400
+  init_mode: "global"
+  resample_threshold: 0.5
+  render_width: 80
+  render_height: 60
+  render_width_hires: 320
+  render_height_hires: 240
+  convergence_threshold: 0.1
+
+motion_model:
+  translation_std: 0.02
+  rotation_std: 0.01
+
+observation:
+  type: "ssim"
+  clip_model: "ViT-B-32"
+  clip_pretrained: "laion2b_s34b_b79k"
+  temperature: 10.0
+  text_query: ""
+
+gradient_refine:
+  enabled: false
+  top_k: 10
+  num_iterations: 50
+  lr_init: 1.0e-2
+  lr_final: 1.0e-5
+  loss_type: "l1+ssim"
+  ssim_weight: 0.2
+  blur_schedule: true
+
+evaluation:
+  success_trans_threshold: 0.05
+  success_rot_threshold: 2.0
+  convergence_threshold: 0.1
+  num_runs: 3
