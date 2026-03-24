@@ -1,0 +1,25 @@
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}llcccc@{}}
+\toprule
+\textbf{Scene} & \textbf{Method} & \textbf{ATE Med.} & \textbf{ARE Med.} & \textbf{Succ. (\%)} & \textbf{ms/step} \\
+\midrule
+  office0 & SSIM & 19.8 cm & 7.6° & 2 & 162 \\
+   & SSIM+Refine & 1.4 cm & 0.3° & 75 & 144 \\
+   & CLIP-Image & 20.5 cm & 7.6° & 2 & 155 \\
+   & CLIP-Text & 19.9 cm & 7.9° & 1 & 159 \\
+  room0 & SSIM & 61.1 cm & 20.5° & 13 & 168 \\
+   & SSIM+Refine & 41.8 cm & 11.4° & 29 & 150 \\
+   & CLIP-Image & 49.2 cm & 18.5° & 2 & 143 \\
+   & CLIP-Text & 40.8 cm & 17.6° & 1 & 139 \\
+  fr3_office & SSIM & 6.3 cm & 1.5° & 40 & 174 \\
+   & SSIM+Refine & 0.6 cm & 0.7° & 94 & 167 \\
+   & CLIP-Image & 10.7 cm & 2.6° & 12 & 175 \\
+   & CLIP-Text & 18.5 cm & 3.6° & 3 & 167 \\
+  room1 & SSIM+Refine & 80.6 cm & 40.2° & 7 & 168 \\
+  fr1_desk & SSIM+Refine & 66.4 cm & 14.6° & 10 & 158 \\
+\bottomrule
+\end{tabular}
+\caption{Localization results: 3 good scenes (all methods) + 2 weak scenes (best method only). ATE/ARE are medians across frames; each config run 3 times, median trial reported. 200 particles, 100 frames, local initialization.}
+\end{table}
