@@ -1,0 +1,380 @@
+# Semantic Particle Filter Localization in 3D Gaussian Splatting Maps
+
+**Course project for Perception in Robotics, Skoltech, Term 3, 2026**
+
+---
+
+## Why This Matters
+
+A robot navigating an indoor environment needs to constantly answer one question: *where am I?* Traditional approaches rely on matching hand-crafted visual features (SIFT, ORB) against a pre-built database of images, but these methods are fragile under lighting changes and require storing large reference databases.
+
+Recent advances in neural scene representations -- particularly [3D Gaussian Splatting](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/) (3DGS) -- offer a compelling alternative. A 3DGS map is a compact (~46 MB), photorealistic, and fully differentiable 3D model of a scene. Given a candidate camera pose, 3DGS can instantly render what the scene *should* look like from that viewpoint. This turns localization into a rendering comparison problem: find the pose whose rendered view best matches what the camera actually sees.
+
+This project builds a complete camera localization system inside 3DGS maps. We use a **particle filter** -- the same probabilistic framework used in real-world robot navigation -- to maintain a distribution over possible poses and iteratively narrow it down using rendered-vs-observed image comparisons. On top of that, we exploit the differentiability of 3DGS to further refine the best estimate via gradient descent, pushing accuracy to the **sub-centimeter** level.
+
+### What We Achieve
+
+- **0.6 cm median localization error** on the TUM fr3_office scene -- matching classical feature-based methods while using a fraction of the storage
+- **Three observation models** compared: pixel-level (SSIM), semantic (CLIP-Image), and zero-shot text-guided (CLIP-Text)
+- **Robustness to lighting changes**: CLIP-based models degrade 7x less than SSIM under brightness perturbation
+- **Global localization**: the particle filter converges from 30 cm of initial uncertainty to sub-2 cm accuracy, where gradient-only methods fail
+
+### What Makes This Approach Interesting
+
+| Property | Classical (HLoc) | Gradient-Only (GSLoc) | Ours (PF + Refine) |
+|----------|------------------|-----------------------|---------------------|
+| Map storage | Hundreds of reference images | Single 3DGS map (46 MB) | Single 3DGS map (46 MB) |
+| Handles large init error | Yes (feature matching) | No (local minima) | Yes (particle filter) |
+| Sub-cm accuracy | Yes | Yes (near GT init) | Yes (with refinement) |
+| Runtime | 7-24 s/frame | ~0.1 s/frame | ~0.15 s/frame |
+| Robust to lighting | No | Partially | Yes (with CLIP) |
+| Needs reference images | Yes | No | No |
+
+The particle filter provides the **global search** that gradient methods lack, while gradient refinement provides the **precision** that particle filters alone cannot achieve. Together, they combine the best of both worlds.
+
+---
+
+## Method Overview
+
+The pipeline operates in two phases: offline map construction and online localization.
+
+### Offline: Map Construction
+
+A 3DGS model is trained from posed RGB-D sequences (TUM RGB-D or Replica). Each scene is represented as ~200,000 oriented 3D Gaussians with learned colors, opacities, and scales. An optional depth supervision loss improves geometric consistency.
+
+### Online: Particle Filter Localization
+
+Given a stream of query images, a Monte Carlo Localization (MCL) particle filter estimates the 6-DoF camera pose at each frame. Each of 200 particles represents a candidate pose. At every timestep:
+
+```
+  Query Image ──────────────────────────────────┐
+                                                 v
+┌─────────────────────────────────────────────────────────┐
+│                   PARTICLE FILTER                       │
+│                                                         │
+│  1. Resample    Select particles proportional           │
+│                 to their weights                        │
+│        │                                                │
+│        v                                                │
+│  2. Roughen     Add small noise to prevent              │
+│                 particle collapse                       │
+│        │                                                │
+│        v                                                │
+│  3. Propagate   Apply motion model noise                │
+│                 (SE(3) perturbation in Lie algebra)     │
+│        │                                                │
+│        v                                                │
+│  4. Render      Render 3DGS view from each              │
+│                 particle's pose via gsplat              │
+│        │                                                │
+│        v                                                │
+│  5. Weight      Compare rendered vs query image         │
+│                 using SSIM, CLIP-Image, or CLIP-Text    │
+│        │                                                │
+│        v                                                │
+│  6. Estimate    Weighted Frechet mean on SE(3)          │
+│                                                         │
+└──────────────────────────┬──────────────────────────────┘
+                           │
+                           v
+┌─────────────────────────────────────────────────────────┐
+│              GRADIENT REFINEMENT (optional)              │
+│                                                         │
+│  Take the PF estimate, optimize it via gradient         │
+│  descent through the differentiable 3DGS renderer.      │
+│  100 iterations of Adam on an se(3) perturbation        │
+│  with coarse-to-fine blur and L1+SSIM loss.             │
+│                                                         │
+└──────────────────────────┬──────────────────────────────┘
+                           │
+                           v
+                    Final 6-DoF Pose
+```
+
+### Observation Models
+
+| Model | What It Compares | Best For |
+|-------|-----------------|----------|
+| **SSIM** | Pixel-level structural similarity between rendered and observed images | Highest accuracy under normal lighting |
+| **CLIP-Image** | High-level visual feature similarity via CLIP ViT-B/32 | Robustness to lighting/appearance changes |
+| **CLIP-Text** | Similarity between rendered image and a text description | Zero-shot localization (no camera image needed) |
+
+### Evaluation Metrics
+
+We report three standard metrics from the visual localization literature:
+
+- **ATE (Absolute Translation Error)**: Euclidean distance between estimated and true camera position, in centimeters. Lower is better. Sub-5 cm is considered good for indoor scenes.
+- **ARE (Absolute Rotation Error)**: Geodesic distance between estimated and true camera orientation, in degrees. Lower is better. Sub-2 degrees is considered good.
+- **Success Rate**: Percentage of frames where both ATE < 5 cm and ARE < 2 degrees. This is the strictest metric -- a single bad frame counts as failure.
+
+---
+
+## Results
+
+### Main Results (3-Trial Median, Depth-Supervised Maps, Tuned Refiner)
+
+| Scene | SSIM | SSIM + Refine | CLIP-Image | CLIP-Text | HLoc Baseline |
+|-------|------|---------------|------------|-----------|---------------|
+| fr3_office | 6.3 cm / 40% | **0.6 cm / 94%** | 10.7 cm / 12% | 18.5 cm / 3% | 0.7 cm / 100% |
+| office0 | 19.8 cm / 2% | **1.4 cm / 75%** | 20.5 cm / 2% | 19.9 cm / 1% | 0.3 cm / 100% |
+| room0 | 61.1 cm / 13% | 41.8 cm / 29% | 49.2 cm / 2% | 40.8 cm / 1% | 0.2 cm / 100% |
+
+*Format: ATE median / success rate (5 cm / 2 deg threshold). Each result is the median of 3 independent runs.*
+
+<p align="center">
+  <img src="results/final_evaluation/figures/model_comparison.png" width="700" alt="Observation model comparison across scenes">
+</p>
+
+### Key Findings
+
+- **Sub-centimeter accuracy on fr3_office** (0.6 cm), matching or exceeding the classical HLoc baseline (0.7 cm) on this scene -- while using a 46 MB map instead of hundreds of reference images.
+- **Gradient refinement is the critical component**, improving particle filter estimates by 10-100x. The PF provides a coarse initialization that gradient descent alone cannot reach from scratch.
+- **CLIP observation models are more robust to lighting changes.** Under gamma-shifted query images, SSIM degrades by up to +12.2 cm while CLIP-Image degrades by at most +1.8 cm.
+- **The particle filter enables convergence from large initial uncertainty** (10-30 cm spread) where pure gradient-based methods collapse.
+
+### Trajectory Tracking
+
+<p align="center">
+  <img src="results/final_evaluation/figures/traj_fr3_office.png" width="32%" alt="Trajectory fr3_office">
+  <img src="results/final_evaluation/figures/traj_office0.png" width="32%" alt="Trajectory office0">
+  <img src="results/final_evaluation/figures/traj_room0.png" width="32%" alt="Trajectory room0">
+</p>
+<p align="center"><i>Estimated vs ground truth trajectories on fr3_office, office0, and room0</i></p>
+
+### Convergence Over Time
+
+<p align="center">
+  <img src="results/final_evaluation/figures/conv_trans_fr3_office.png" width="32%" alt="Convergence fr3_office">
+  <img src="results/final_evaluation/figures/conv_trans_office0.png" width="32%" alt="Convergence office0">
+  <img src="results/final_evaluation/figures/conv_trans_room0.png" width="32%" alt="Convergence room0">
+</p>
+<p align="center"><i>Translation error over time across all observation models</i></p>
+
+### GSLoc Baseline: Why the Particle Filter Matters
+
+GSLoc is a gradient-only approach -- it optimizes pose directly via gradient descent, without any particle filter. It works great when you start close to the answer, but falls apart with larger initial uncertainty:
+
+| Init Noise | office0 | room0 | fr3_office | Avg Success |
+|------------|---------|-------|------------|-------------|
+| 3 cm | 1.1 cm | 1.2 cm | 1.3 cm | 98% |
+| 10 cm | 1.6 cm | 1.4 cm | 3.4 cm | 72% |
+| 20 cm | 13.6 cm | 9.3 cm | 19.2 cm | 31% |
+
+At 20 cm initial error, GSLoc succeeds only 31% of the time -- gradient descent gets stuck in local minima. The particle filter's stochastic exploration avoids this trap.
+
+<p align="center">
+  <img src="results/gsloc_baseline/noise_vs_ate.png" width="48%" alt="GSLoc ATE vs noise">
+  <img src="results/gsloc_baseline/noise_vs_success.png" width="48%" alt="GSLoc success vs noise">
+</p>
+
+### HLoc Baseline: Classical Feature Matching
+
+| Scene | ATE | ARE | Success | Runtime |
+|-------|-----|-----|---------|---------|
+| office0 | 0.3 cm | 0.1 deg | 100% | 7 s/frame |
+| room0 | 0.2 cm | 0.0 deg | 100% | 17 s/frame |
+| fr3_office | 0.7 cm | 0.5 deg | 100% | 24 s/frame |
+
+HLoc (SIFT + depth-backed PnP) achieves near-perfect accuracy but requires storing hundreds of reference images with depth maps. Our approach uses a single compact 3DGS checkpoint and runs 20-80x faster per frame.
+
+<p align="center">
+  <img src="results/hloc_baseline/hloc_comparison.png" width="700" alt="HLoc comparison">
+</p>
+
+### Global Localization
+
+Starting from a wide initial uncertainty (no precise pose prior), the particle filter converges to sub-2 cm accuracy:
+
+| Init Spread | Final ATE | Converged |
+|-------------|-----------|-----------|
+| 10 cm | 1.6 cm | Yes |
+| 20 cm | 1.5 cm | Yes |
+| 30 cm | 1.7 cm | Yes |
+| 50 cm | 133 cm | No |
+
+<p align="center">
+  <img src="results/global_localization/convergence_global.png" width="48%" alt="Global convergence">
+  <img src="results/global_localization/trajectory_global.png" width="48%" alt="Global trajectory">
+</p>
+
+### Lighting Robustness: SSIM vs CLIP
+
+CLIP-based observation models maintain stable accuracy under brightness changes, while SSIM degrades significantly:
+
+<p align="center">
+  <img src="results/lighting_ablation/lighting_robustness.png" width="48%" alt="Lighting robustness">
+  <img src="results/lighting_ablation/success_rate.png" width="48%" alt="Lighting success rate">
+</p>
+<p align="center"><i>Under gamma-shifted images, CLIP-Image barely changes while SSIM degrades by up to 12 cm</i></p>
+
+### Ablation: Particle Count
+
+<p align="center">
+  <img src="results/ablations/ablation_particles_office0.png" width="500" alt="Particle count ablation">
+</p>
+
+---
+
+## Project Structure
+
+```
+semantic_pf_loc/
+├── src/semantic_pf_loc/           Core library
+│   ├── particle_filter.py         Standard MCL: propagate, weight, resample
+│   ├── batch_renderer.py          gsplat batched rendering for N particles
+│   ├── gradient_refiner.py        Differentiable pose refinement (L1+SSIM)
+│   ├── gaussian_map.py            3DGS map loading and management
+│   ├── motion_model.py            Constant-velocity + Gaussian noise in SE(3)
+│   ├── resampling.py              Systematic resampling with roughening
+│   ├── config.py                  OmegaConf-based configuration
+│   ├── observation/
+│   │   ├── base.py                Abstract observation model interface
+│   │   ├── ssim.py                SSIM (pixel-level)
+│   │   ├── clip_image.py          CLIP visual features
+│   │   └── clip_text.py           CLIP text-guided (zero-shot)
+│   ├── datasets/
+│   │   ├── base.py                Abstract dataset interface
+│   │   ├── tum.py                 TUM RGB-D format
+│   │   └── replica.py             Replica format
+│   ├── evaluation/
+│   │   ├── metrics.py             ATE, ARE, success rate
+│   │   └── evaluator.py           End-to-end evaluation driver
+│   └── utils/
+│       ├── pose_utils.py          SE(3) conversions, weighted Frechet mean
+│       ├── colmap_utils.py        COLMAP format I/O
+│       └── visualization.py       Trajectory plots, convergence curves
+│
+├── scripts/                       Runnable experiments
+│   ├── train_gs.py                Train 3DGS map (+ optional depth loss)
+│   ├── run_localization.py        Single-scene localization
+│   ├── run_final_evaluation.py    3-trial evaluation, all models
+│   ├── run_ablations.py           Parameter sweep experiments
+│   ├── run_lighting_ablation.py   SSIM vs CLIP under gamma shift
+│   ├── run_gsloc_baseline.py      Gradient-only baseline
+│   ├── run_hloc_baseline.py       Classical feature matching baseline
+│   ├── run_global_localization.py Uniform-init convergence demo
+│   └── tune_refiner.py            Refiner hyperparameter search
+│
+├── configs/
+│   ├── default.yaml               Default hyperparameters
+│   ├── train_gs/                  Per-scene training configs (6 scenes)
+│   └── localize/                  Per-model localization configs (3 models)
+│
+├── results/                       All evaluation outputs and figures
+├── checkpoints/                   Trained 3DGS maps (~46 MB each)
+├── checkpoints_depth/             Depth-supervised 3DGS maps
+└── data/                          Raw datasets (TUM RGB-D, Replica)
+```
+
+---
+
+## Setup
+
+All dependencies are pre-installed on the compute server:
+
+```bash
+ssh compute
+cd /home/anywherevla/semantic_pf_loc
+source .env   # REQUIRED: sets CUDA_HOME for gsplat JIT compilation
+```
+
+### Dependencies
+
+| Package | Purpose |
+|---------|---------|
+| `torch` >= 2.1 | Deep learning framework |
+| `gsplat` >= 1.0 | Differentiable 3DGS rasterization |
+| `pypose` >= 0.6 | SE(3) Lie group operations |
+| `open-clip-torch` | CLIP observation models (ViT-B/32) |
+| `pytorch-msssim` | Differentiable SSIM loss |
+| `omegaconf` | YAML configuration |
+| `opencv-python` | Image I/O, SIFT features (HLoc baseline) |
+
+### Installing from Scratch
+
+```bash
+pip install -e .
+pip install -r requirements.txt
+```
+
+Ensure `CUDA_HOME` points to a CUDA 12.x installation before installing gsplat.
+
+---
+
+## Quick Start
+
+### 1. Train a 3DGS Map
+
+```bash
+# Standard training
+python3 scripts/train_gs.py configs/train_gs/replica_office0.yaml --output_dir checkpoints
+
+# With depth supervision (recommended)
+python3 scripts/train_gs.py configs/train_gs/replica_office0.yaml \
+  --output_dir checkpoints_depth --depth_weight 0.5
+```
+
+### 2. Run Localization
+
+```bash
+python3 scripts/run_localization.py configs/train_gs/replica_office0.yaml \
+  --checkpoint checkpoints_depth/office0.ckpt \
+  --localize_config configs/localize/pf_ssim.yaml
+```
+
+### 3. Run Full Evaluation
+
+```bash
+python3 scripts/run_final_evaluation.py
+# Output: results/final_evaluation/figures/ + results_table.tex
+```
+
+### 4. Run Individual Experiments
+
+```bash
+python3 scripts/run_ablations.py --scene office0         # Parameter sweeps
+python3 scripts/run_lighting_ablation.py                  # SSIM vs CLIP robustness
+python3 scripts/run_gsloc_baseline.py                     # Gradient-only baseline
+python3 scripts/run_hloc_baseline.py                      # Classical baseline
+python3 scripts/run_global_localization.py                # Global localization demo
+```
+
+---
+
+## Trained Maps
+
+| Scene | PSNR | Dataset | Localization (SSIM+Refine) |
+|-------|------|---------|---------------------------|
+| office0 | 28.0 dB | Replica | 1.4 cm / 75% success |
+| fr3_office | 23.7 dB | TUM RGB-D | 0.6 cm / 94% success |
+| room0 | 23.5 dB | Replica | 41.8 cm / 29% success |
+| room1 | 26.2 dB | Replica | 80.6 cm / 7% success |
+| fr1_desk | 23.0 dB | TUM RGB-D | 66.4 cm / 10% success |
+| fr2_xyz | 17.5 dB | TUM RGB-D | Not evaluated (map too weak) |
+
+Map quality (PSNR) strongly correlates with localization accuracy. Scenes above ~24 dB yield reliable tracking.
+
+---
+
+## Key Parameters
+
+| Parameter | Value | Notes |
+|-----------|-------|-------|
+| Particles | 200 (eval) / 400 (default) | 50-400 tested in ablation |
+| PF render resolution | 160 x 120 | Low-res for fast particle weighting |
+| Refiner resolution | 320 x 240 | Higher-res for gradient precision |
+| SSIM temperature | 3.0 | Amplifies weight differences |
+| Refiner iterations | 100 | Adam with cosine LR decay |
+| Refiner LR | 0.01 | Tuned via grid search |
+| Refiner loss | L1 + 0.2 * SSIM | Combined photometric loss |
+| Success threshold | 5 cm / 2 deg | Standard visual localization threshold |
+
+---
+
+## References
+
+- Kerbl et al., "3D Gaussian Splatting for Real-Time Radiance Field Rendering," SIGGRAPH 2023
+- Yen-Chen et al., "iNeRF: Inverting Neural Radiance Fields for Pose Estimation," IROS 2021
+- Maggio et al., "Loc-NeRF: Monte Carlo Localization using Neural Radiance Fields," ICRA 2023
+- Haitz et al., "GSLoc: Visual Localization with 3D Gaussian Splatting," arXiv 2024
+- Pan et al., "NuRF: Neural Radiance Field for Localization," ICRA 2024
