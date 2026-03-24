@@ -1,0 +1,146 @@
+{
+  "metadata": {
+    "date": "2026-03-24 20:30:30",
+    "description": "Observation model improvements test",
+    "n_particles": 200,
+    "n_frames": 100,
+    "seed": 42,
+    "best_config": "ssim_320x240_anneal"
+  },
+  "room0_results": [
+    {
+      "config_name": "baseline_ssim_160x120",
+      "scene": "room0",
+      "raw_ate_median_cm": 62.145620584487915,
+      "raw_ate_mean_cm": 60.15675067901611,
+      "raw_sr": 7.999999821186066,
+      "refined_ate_median_cm": 33.77932906150818,
+      "refined_ate_mean_cm": 59.52267646789551,
+      "refined_sr": 30.000001192092896,
+      "refined_are_median": 9.286455154418945,
+      "runtime_mean_ms": 3256.30810546875,
+      "convergence_frame": 100
+    },
+    {
+      "config_name": "msssim_160x120",
+      "scene": "room0",
+      "raw_ate_median_cm": 59.78882312774658,
+      "raw_ate_mean_cm": 90.19022583961487,
+      "raw_sr": 10.000000149011612,
+      "refined_ate_median_cm": 33.234065771102905,
+      "refined_ate_mean_cm": 82.44943022727966,
+      "refined_sr": 30.000001192092896,
+      "refined_are_median": 8.88020133972168,
+      "runtime_mean_ms": 3466.080078125,
+      "convergence_frame": 100
+    },
+    {
+      "config_name": "ssim_320x240",
+      "scene": "room0",
+      "raw_ate_median_cm": 58.4999144077301,
+      "raw_ate_mean_cm": 60.560208559036255,
+      "raw_sr": 5.000000074505806,
+      "refined_ate_median_cm": 35.655006766319275,
+      "refined_ate_mean_cm": 59.892821311950684,
+      "refined_sr": 31.00000023841858,
+      "refined_are_median": 9.421476364135742,
+      "runtime_mean_ms": 3870.39404296875,
+      "convergence_frame": 100
+    },
+    {
+      "config_name": "ssim_160x120_anneal",
+      "scene": "room0",
+      "raw_ate_median_cm": 60.345298051834106,
+      "raw_ate_mean_cm": 57.960402965545654,
+      "raw_sr": 5.999999865889549,
+      "refined_ate_median_cm": 33.86968374252319,
+      "refined_ate_mean_cm": 58.27181339263916,
+      "refined_sr": 30.000001192092896,
+      "refined_are_median": 8.981613159179688,
+      "runtime_mean_ms": 4039.568115234375,
+      "convergence_frame": 100
+    },
+    {
+      "config_name": "ssim_320x240_anneal",
+      "scene": "room0",
+      "raw_ate_median_cm": 58.19067358970642,
+      "raw_ate_mean_cm": 57.49902129173279,
+      "raw_sr": 7.000000029802322,
+      "refined_ate_median_cm": 29.24107015132904,
+      "refined_ate_mean_cm": 56.28443360328674,
+      "refined_sr": 31.999999284744263,
+      "refined_are_median": 7.722326278686523,
+      "runtime_mean_ms": 4072.97412109375,
+      "convergence_frame": 100
+    },
+    {
+      "config_name": "msssim_320x240_anneal",
+      "scene": "room0",
+      "raw_ate_median_cm": 62.49412298202515,
+      "raw_ate_mean_cm": 98.45585823059082,
+      "raw_sr": 7.000000029802322,
+      "refined_ate_median_cm": 31.85998797416687,
+      "refined_ate_mean_cm": 87.54584789276123,
+      "refined_sr": 31.00000023841858,
+      "refined_are_median": 8.657801628112793,
+      "runtime_mean_ms": 4144.20654296875,
+      "convergence_frame": 100
+    }
+  ],
+  "regression_results": [
+    {
+      "config_name": "ssim_320x240_anneal",
+      "scene": "office0",
+      "raw_ate_median_cm": 21.113456785678864,
+      "raw_ate_mean_cm": 25.40401518344879,
+      "raw_sr": 1.9999999552965164,
+      "refined_ate_median_cm": 0.4206645768135786,
+      "refined_ate_mean_cm": 17.841047048568726,
+      "refined_sr": 75.0,
+      "refined_are_median": 0.09691329300403595,
+      "runtime_mean_ms": 4427.07861328125,
+      "convergence_frame": 100
+    },
+    {
+      "config_name": "ssim_320x240_anneal",
+      "scene": "fr3_office",
+      "raw_ate_median_cm": 16.035492718219757,
+      "raw_ate_mean_cm": 170.5966353416443,
+      "raw_sr": 15.999999642372131,
+      "refined_ate_median_cm": 0.49872351810336113,
+      "refined_ate_mean_cm": 160.49563884735107,
+      "refined_sr": 79.00000214576721,
+      "refined_are_median": 0.7763210535049438,
+      "runtime_mean_ms": 4362.201171875,
+      "convergence_frame": 57
+    }
+  ],
+  "baseline_regression": [
+    {
+      "config_name": "baseline_ssim_160x120",
+      "scene": "office0",
+      "raw_ate_median_cm": 26.897257566452026,
+      "raw_ate_mean_cm": 29.50608730316162,
+      "raw_sr": 0.9999999776482582,
+      "refined_ate_median_cm": 0.41147293522953987,
+      "refined_ate_mean_cm": 19.168826937675476,
+      "refined_sr": 74.00000095367432,
+      "refined_are_median": 0.13417039811611176,
+      "runtime_mean_ms": 4061.632080078125,
+      "convergence_frame": 100
+    },
+    {
+      "config_name": "baseline_ssim_160x120",
+      "scene": "fr3_office",
+      "raw_ate_median_cm": 11.056564748287201,
+      "raw_ate_mean_cm": 71.52146697044373,
+      "raw_sr": 25.999999046325684,
+      "refined_ate_median_cm": 0.46483525075018406,
+      "refined_ate_mean_cm": 64.3165111541748,
+      "refined_sr": 92.00000166893005,
+      "refined_are_median": 0.6154849529266357,
+      "runtime_mean_ms": 4335.27490234375,
+      "convergence_frame": 75
+    }
+  ]
+}

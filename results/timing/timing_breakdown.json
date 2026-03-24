@@ -1,0 +1,82 @@
+{
+  "metadata": {
+    "scene": "fr3_office",
+    "observation_model": "SSIM",
+    "n_particles": 200,
+    "n_frames": 100,
+    "pf_resolution": "160x120 (low) / 320x240 (hi)",
+    "refiner_resolution": "320x240",
+    "refiner_iterations": 100,
+    "device": "cuda"
+  },
+  "timing_breakdown": {
+    "resampling": {
+      "mean_ms": 0.43,
+      "std_ms": 0.582,
+      "min_ms": 0.011,
+      "max_ms": 3.838,
+      "pct_of_total": 0.0
+    },
+    "roughening": {
+      "mean_ms": 3.348,
+      "std_ms": 5.634,
+      "min_ms": 0.008,
+      "max_ms": 57.5,
+      "pct_of_total": 0.3
+    },
+    "motion_prediction": {
+      "mean_ms": 2.935,
+      "std_ms": 6.133,
+      "min_ms": 1.236,
+      "max_ms": 63.05,
+      "pct_of_total": 0.2
+    },
+    "obs_prepare": {
+      "mean_ms": 0.067,
+      "std_ms": 0.079,
+      "min_ms": 0.038,
+      "max_ms": 0.73,
+      "pct_of_total": 0.0
+    },
+    "rendering": {
+      "mean_ms": 41.888,
+      "std_ms": 24.517,
+      "min_ms": 34.132,
+      "max_ms": 285.04,
+      "pct_of_total": 3.4
+    },
+    "observation_weights": {
+      "mean_ms": 63.785,
+      "std_ms": 2.172,
+      "min_ms": 59.378,
+      "max_ms": 79.317,
+      "pct_of_total": 5.2
+    },
+    "pose_estimation": {
+      "mean_ms": 1.221,
+      "std_ms": 5.831,
+      "min_ms": 0.302,
+      "max_ms": 59.215,
+      "pct_of_total": 0.1
+    },
+    "gradient_refinement": {
+      "mean_ms": 1087.347,
+      "std_ms": 405.51,
+      "min_ms": 860.71,
+      "max_ms": 4955.69,
+      "pct_of_total": 88.3
+    },
+    "total_step": {
+      "mean_ms": 1230.906,
+      "std_ms": 420.993,
+      "min_ms": 991.501,
+      "max_ms": 5220.287,
+      "pct_of_total": 100.0
+    },
+    "gradient_refinement_active_only": {
+      "mean_ms": 1087.347,
+      "n_active_frames": 100,
+      "n_total_frames": 100
+    }
+  }
+}

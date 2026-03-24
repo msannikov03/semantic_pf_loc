@@ -30,3 +30,13 @@ Thumbs.db
 *.pt
 !results/**/*.pt
 CLAUDE.md
+
+# Video frames (keep GIF/MP4, skip raw frames)
+results/video/frames/
+
+# Redundant result directories (superseded by final_evaluation)
+results/full_evaluation/
+results/depth_comparison/
+results/depth_comparison_v2/
+results/refiner_tuning/
+results/fr1_desk/

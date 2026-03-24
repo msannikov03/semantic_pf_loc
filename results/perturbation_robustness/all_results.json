@@ -1,0 +1,156 @@
+[
+  {
+    "scene": "fr3_office",
+    "model": "SSIM",
+    "perturbation": "none",
+    "ate_median": 0.07280297577381134,
+    "ate_mean": 0.20066140592098236,
+    "ate_rmse": 0.7243611812591553,
+    "are_median": 1.6471073627471924,
+    "success_rate": 0.3799999952316284,
+    "runtime_ms": 133.1727294921875
+  },
+  {
+    "scene": "fr3_office",
+    "model": "SSIM",
+    "perturbation": "noise",
+    "ate_median": 0.2607293426990509,
+    "ate_mean": 2.196575403213501,
+    "ate_rmse": 3.7694194316864014,
+    "are_median": 4.926486015319824,
+    "success_rate": 0.25999999046325684,
+    "runtime_ms": 172.63925170898438
+  },
+  {
+    "scene": "fr3_office",
+    "model": "SSIM",
+    "perturbation": "motion_blur",
+    "ate_median": 0.07422062754631042,
+    "ate_mean": 0.16838225722312927,
+    "ate_rmse": 0.5790735483169556,
+    "are_median": 1.6542208194732666,
+    "success_rate": 0.27000001072883606,
+    "runtime_ms": 143.7062530517578
+  },
+  {
+    "scene": "fr3_office",
+    "model": "SSIM",
+    "perturbation": "color_temp",
+    "ate_median": 0.06581820547580719,
+    "ate_mean": 0.19234253466129303,
+    "ate_rmse": 0.7119714021682739,
+    "are_median": 1.7645835876464844,
+    "success_rate": 0.4099999964237213,
+    "runtime_ms": 145.13711547851562
+  },
+  {
+    "scene": "fr3_office",
+    "model": "SSIM",
+    "perturbation": "contrast",
+    "ate_median": 0.08450787514448166,
+    "ate_mean": 0.23092004656791687,
+    "ate_rmse": 0.7439800500869751,
+    "are_median": 1.8709529638290405,
+    "success_rate": 0.25999999046325684,
+    "runtime_ms": 146.28598022460938
+  },
+  {
+    "scene": "fr3_office",
+    "model": "SSIM",
+    "perturbation": "jpeg",
+    "ate_median": 0.04718106985092163,
+    "ate_mean": 0.1595054417848587,
+    "ate_rmse": 0.779574990272522,
+    "are_median": 1.280236005783081,
+    "success_rate": 0.5099999904632568,
+    "runtime_ms": 143.95147705078125
+  },
+  {
+    "scene": "fr3_office",
+    "model": "SSIM",
+    "perturbation": "combined",
+    "ate_median": 0.09781695157289505,
+    "ate_mean": 0.21835042536258698,
+    "ate_rmse": 0.7568550109863281,
+    "are_median": 2.124859571456909,
+    "success_rate": 0.2800000011920929,
+    "runtime_ms": 147.19989013671875
+  },
+  {
+    "scene": "fr3_office",
+    "model": "CLIP-Image",
+    "perturbation": "none",
+    "ate_median": 0.18438613414764404,
+    "ate_mean": 0.2399635910987854,
+    "ate_rmse": 0.3050652742385864,
+    "are_median": 3.399378776550293,
+    "success_rate": 0.20999999344348907,
+    "runtime_ms": 138.28707885742188
+  },
+  {
+    "scene": "fr3_office",
+    "model": "CLIP-Image",
+    "perturbation": "noise",
+    "ate_median": 0.204217791557312,
+    "ate_mean": 0.2544480562210083,
+    "ate_rmse": 0.3117973506450653,
+    "are_median": 3.7627551555633545,
+    "success_rate": 0.09000000357627869,
+    "runtime_ms": 135.2350616455078
+  },
+  {
+    "scene": "fr3_office",
+    "model": "CLIP-Image",
+    "perturbation": "motion_blur",
+    "ate_median": 0.22896911203861237,
+    "ate_mean": 0.28540894389152527,
+    "ate_rmse": 0.3542775809764862,
+    "are_median": 4.26406717300415,
+    "success_rate": 0.07999999821186066,
+    "runtime_ms": 140.84117126464844
+  },
+  {
+    "scene": "fr3_office",
+    "model": "CLIP-Image",
+    "perturbation": "color_temp",
+    "ate_median": 0.1953229010105133,
+    "ate_mean": 0.2404329478740692,
+    "ate_rmse": 0.3099055588245392,
+    "are_median": 4.272510051727295,
+    "success_rate": 0.1599999964237213,
+    "runtime_ms": 138.32501220703125
+  },
+  {
+    "scene": "fr3_office",
+    "model": "CLIP-Image",
+    "perturbation": "contrast",
+    "ate_median": 0.18972882628440857,
+    "ate_mean": 0.2510112226009369,
+    "ate_rmse": 0.32252126932144165,
+    "are_median": 3.7459614276885986,
+    "success_rate": 0.09000000357627869,
+    "runtime_ms": 139.60862731933594
+  },
+  {
+    "scene": "fr3_office",
+    "model": "CLIP-Image",
+    "perturbation": "jpeg",
+    "ate_median": 0.17291386425495148,
+    "ate_mean": 0.2340974062681198,
+    "ate_rmse": 0.302039235830307,
+    "are_median": 3.2565419673919678,
+    "success_rate": 0.2199999988079071,
+    "runtime_ms": 139.49290466308594
+  },
+  {
+    "scene": "fr3_office",
+    "model": "CLIP-Image",
+    "perturbation": "combined",
+    "ate_median": 0.18214598298072815,
+    "ate_mean": 0.23307836055755615,
+    "ate_rmse": 0.2870178520679474,
+    "are_median": 3.5087778568267822,
+    "success_rate": 0.07000000029802322,
+    "runtime_ms": 138.56668090820312
+  }
+]

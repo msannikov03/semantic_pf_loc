@@ -1,0 +1,17 @@
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcccccccccccccc@{}}
+\toprule
+& \multicolumn{2}{c}{None} & \multicolumn{2}{c}{Noise} & \multicolumn{2}{c}{Motion Blur} & \multicolumn{2}{c}{Color Temp} & \multicolumn{2}{c}{Contrast} & \multicolumn{2}{c}{Jpeg} & \multicolumn{2}{c}{Combined} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11} \cmidrule(lr){12-13} \cmidrule(lr){14-15}
+\textbf{Metric} & ATE$\downarrow$ & SR$\uparrow$ & ATE$\downarrow$ & SR$\uparrow$ & ATE$\downarrow$ & SR$\uparrow$ & ATE$\downarrow$ & SR$\uparrow$ & ATE$\downarrow$ & SR$\uparrow$ & ATE$\downarrow$ & SR$\uparrow$ & ATE$\downarrow$ & SR$\uparrow$ \\
+\midrule
+  SSIM & 7.3 & 38\% & 26.1 & 26\% & 7.4 & 27\% & 6.6 & 41\% & 8.5 & 26\% & 4.7 & 51\% & 9.8 & 28\% \\
+  CLIP-Image & 18.4 & 21\% & 20.4 & 9\% & 22.9 & 8\% & 19.5 & 16\% & 19.0 & 9\% & 17.3 & 22\% & 18.2 & 7\% \\
+\bottomrule
+\end{tabular}
+\caption{ATE median (cm) and success rate (\%) under various image perturbations on fr3\_office. CLIP-Image features are robust to pixel-level degradations while SSIM degrades severely, especially under combined perturbations.}
+\label{tab:perturbation_robustness}
+\end{table}

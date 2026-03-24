@@ -1,0 +1,38 @@
+[
+  {
+    "label": "Uniform (no retrieval)",
+    "ate_median": 1.7125145196914673,
+    "ate_mean": 1.79285728931427,
+    "ate_final": 1.8157037496566772,
+    "are_median": 127.54713439941406,
+    "are_final": 102.8949203491211,
+    "success_rate": 0.0,
+    "conv_5cm": 150,
+    "conv_10cm": 150,
+    "retrieval_init_error_cm": 0.0
+  },
+  {
+    "label": "CLIP retrieval + PF",
+    "ate_median": 0.32453474402427673,
+    "ate_mean": 0.31168875098228455,
+    "ate_final": 0.4989336133003235,
+    "are_median": 56.02646255493164,
+    "are_final": 93.39017486572266,
+    "success_rate": 0.0,
+    "conv_5cm": 150,
+    "conv_10cm": 150,
+    "retrieval_init_error_cm": 0.0
+  },
+  {
+    "label": "CLIP retrieval + PF + Refine",
+    "ate_median": 0.01835859753191471,
+    "ate_mean": 0.2827770411968231,
+    "ate_final": 0.018185239285230637,
+    "are_median": 0.39958450198173523,
+    "are_final": 0.443533718585968,
+    "success_rate": 0.7933333516120911,
+    "conv_5cm": 60,
+    "conv_10cm": 49,
+    "retrieval_init_error_cm": 0.0
+  }
+]
