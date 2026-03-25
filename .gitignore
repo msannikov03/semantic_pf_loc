@@ -40,3 +40,4 @@ results/depth_comparison/
 results/depth_comparison_v2/
 results/refiner_tuning/
 results/fr1_desk/
+*.pdf
