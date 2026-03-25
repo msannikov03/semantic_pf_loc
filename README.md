@@ -49,48 +49,40 @@ A 3DGS model is trained from posed RGB-D sequences (TUM RGB-D or Replica). Each 
 Given a stream of query images, a Monte Carlo Localization (MCL) particle filter estimates the 6-DoF camera pose at each frame. Each of 200 particles represents a candidate pose. At every timestep:
 
 ```
-  Query Image ──────────────────────────────────┐
-                                                 v
-┌─────────────────────────────────────────────────────────┐
-│                   PARTICLE FILTER                       │
-│                                                         │
-│  1. Resample    Select particles proportional           │
-│                 to their weights                        │
-│        │                                                │
-│        v                                                │
-│  2. Roughen     Add small noise to prevent              │
-│                 particle collapse                       │
-│        │                                                │
-│        v                                                │
-│  3. Propagate   Apply motion model noise                │
-│                 (SE(3) perturbation in Lie algebra)     │
-│        │                                                │
-│        v                                                │
-│  4. Render      Render 3DGS view from each              │
-│                 particle's pose via gsplat              │
-│        │                                                │
-│        v                                                │
-│  5. Weight      Compare rendered vs query image         │
-│                 using SSIM, CLIP-Image, or CLIP-Text    │
-│        │                                                │
-│        v                                                │
-│  6. Estimate    Weighted Frechet mean on SE(3)          │
-│                                                         │
-└──────────────────────────┬──────────────────────────────┘
-                           │
-                           v
-┌─────────────────────────────────────────────────────────┐
-│              GRADIENT REFINEMENT (optional)              │
-│                                                         │
-│  Take the PF estimate, optimize it via gradient         │
-│  descent through the differentiable 3DGS renderer.      │
-│  100 iterations of Adam on an se(3) perturbation        │
-│  with coarse-to-fine blur and L1+SSIM loss.             │
-│                                                         │
-└──────────────────────────┬──────────────────────────────┘
-                           │
-                           v
-                    Final 6-DoF Pose
+Query Image
+    │
+    v
+┌────────────────────────────────────────────┐
+│           PARTICLE FILTER                  │
+│                                            │
+│  1. Resample   proportional to weights     │
+│       │                                    │
+│       v                                    │
+│  2. Roughen    add noise (prevent collapse)│
+│       │                                    │
+│       v                                    │
+│  3. Propagate  SE(3) motion model noise    │
+│       │                                    │
+│       v                                    │
+│  4. Render     3DGS view per particle      │
+│       │                                    │
+│       v                                    │
+│  5. Weight     SSIM / LPIPS / CLIP score   │
+│       │                                    │
+│       v                                    │
+│  6. Estimate   weighted Frechet mean SE(3) │
+└────────────────────┬───────────────────────┘
+                     │
+                     v
+┌────────────────────────────────────────────┐
+│       GRADIENT REFINEMENT (optional)       │
+│                                            │
+│  Optimize se(3) perturbation via Adam      │
+│  100 iters, L1+SSIM, coarse-to-fine blur   │
+└────────────────────┬───────────────────────┘
+                     │
+                     v
+              Final 6-DoF Pose
 ```
 
 ### Observation Models
@@ -148,21 +140,18 @@ We report three standard metrics from the visual localization literature:
 
 ### Trajectory Tracking
 
-<p align="center">
-  <img src="results/final_evaluation/figures/traj_fr3_office.png" width="32%" alt="Trajectory fr3_office">
-  <img src="results/final_evaluation/figures/traj_office0.png" width="32%" alt="Trajectory office0">
-  <img src="results/final_evaluation/figures/traj_room0.png" width="32%" alt="Trajectory room0">
-</p>
-<p align="center"><i>Estimated vs ground truth trajectories on fr3_office, office0, and room0</i></p>
+| fr3_office (0.43 cm ATE) | office0 (0.41 cm ATE) | room0 (38.5 cm ATE) |
+|:---:|:---:|:---:|
+| <img src="results/final_evaluation/figures/traj_fr3_office.png" height="250" alt="Trajectory fr3_office"> | <img src="results/final_evaluation/figures/traj_office0.png" height="250" alt="Trajectory office0"> | <img src="results/final_evaluation/figures/traj_room0.png" height="250" alt="Trajectory room0"> |
+| Tight tracking | Tracks then diverges | PF cannot discriminate |
 
 ### Convergence Over Time
 
-<p align="center">
-  <img src="results/final_evaluation/figures/conv_trans_fr3_office.png" width="32%" alt="Convergence fr3_office">
-  <img src="results/final_evaluation/figures/conv_trans_office0.png" width="32%" alt="Convergence office0">
-  <img src="results/final_evaluation/figures/conv_trans_room0.png" width="32%" alt="Convergence room0">
-</p>
-<p align="center"><i>Translation error over time across all observation models (depth-supervised checkpoints; depth-initialized results show further improvement)</i></p>
+| fr3_office | office0 | room0 |
+|:---:|:---:|:---:|
+| <img src="results/final_evaluation/figures/conv_trans_fr3_office.png" height="220" alt="Convergence fr3_office"> | <img src="results/final_evaluation/figures/conv_trans_office0.png" height="220" alt="Convergence office0"> | <img src="results/final_evaluation/figures/conv_trans_room0.png" height="220" alt="Convergence room0"> |
+
+*Translation error over time across observation models. Depth-initialized maps show further improvement over these depth-supervised results.*
 
 ### GSLoc Baseline: Why the Particle Filter Matters
 
@@ -176,10 +165,9 @@ GSLoc is a gradient-only approach -- it optimizes pose directly via gradient des
 
 At 20 cm initial error, GSLoc succeeds only 31% of the time -- gradient descent gets stuck in local minima. The particle filter's stochastic exploration avoids this trap.
 
-<p align="center">
-  <img src="results/gsloc_baseline/noise_vs_ate.png" width="48%" alt="GSLoc ATE vs noise">
-  <img src="results/gsloc_baseline/noise_vs_success.png" width="48%" alt="GSLoc success vs noise">
-</p>
+| ATE vs initialization noise | Success rate vs initialization noise |
+|:---:|:---:|
+| <img src="results/gsloc_baseline/noise_vs_ate.png" height="220" alt="GSLoc ATE vs noise"> | <img src="results/gsloc_baseline/noise_vs_success.png" height="220" alt="GSLoc success vs noise"> |
 
 ### HLoc Baseline: Classical Feature Matching
 
@@ -206,10 +194,9 @@ HLoc (SIFT + depth-backed PnP) achieves near-perfect accuracy but requires stori
 | 30 cm | 1.6 cm | Yes |
 | 50 cm | 131 cm | No |
 
-<p align="center">
-  <img src="results/global_localization/convergence_global.png" width="48%" alt="Global convergence">
-  <img src="results/global_localization/trajectory_global.png" width="48%" alt="Global trajectory">
-</p>
+| Convergence from various init spreads | Trajectory convergence |
+|:---:|:---:|
+| <img src="results/global_localization/convergence_global.png" height="280" alt="Global convergence"> | <img src="results/global_localization/trajectory_global.png" height="280" alt="Global trajectory"> |
 
 **CLIP retrieval + PF** (completely unknown position): CLIP encodes reference views from known poses, finds the nearest match to the query, then initializes the PF around that pose.
 
@@ -229,10 +216,9 @@ CLIP observation models are significantly more robust than SSIM under various im
 | Gaussian noise (sigma=0.2) | 3.6x worse | 1.1x worse | **~3x more robust** |
 | Gamma shift (0.5x/2.0x) | Up to +12.2 cm (room0) | Up to +1.1 cm (fr3_office) | More stable across scenes |
 
-<p align="center">
-  <img src="results/lighting_ablation/lighting_robustness.png" width="48%" alt="Lighting robustness">
-  <img src="results/lighting_ablation/success_rate.png" width="48%" alt="Lighting success rate">
-</p>
+| ATE under gamma shift | Success rate under gamma shift |
+|:---:|:---:|
+| <img src="results/lighting_ablation/lighting_robustness.png" height="220" alt="Lighting robustness"> | <img src="results/lighting_ablation/success_rate.png" height="220" alt="Lighting success rate"> |
 
 ### Ablation: Particle Count
 
