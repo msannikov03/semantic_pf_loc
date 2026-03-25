@@ -364,7 +364,7 @@ python3 scripts/run_global_localization.py                # Global localization 
 | office0 | **37.9 dB** | Replica | **0.41 cm / 75%** |
 | fr3_office | **25.0 dB** | TUM RGB-D | **0.43 cm / 99%** |
 | room0 | **32.3 dB** | Replica | 38.5 cm / 30% |
-| room1 | **34.7 dB** | Replica | 71.5 cm / 4% |
+| room1 | **34.7 dB** | Replica | 71.5 cm / 2% |
 | fr1_desk | **22.4 dB** | TUM RGB-D | 69.1 cm / 19% |
 
 ### Random-Initialized (baseline)
