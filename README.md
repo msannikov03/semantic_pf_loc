@@ -125,10 +125,6 @@ We report three standard metrics from the visual localization literature:
 </p>
 <p align="center"><i>Left: actual camera image. Right: 3DGS rendered from estimated pose. The rendered view closely matches the observation, confirming sub-cm pose accuracy.</i></p>
 
-<p align="center">
-  <img src="results/final_evaluation/figures/model_comparison.png" width="700" alt="Observation model comparison across scenes">
-</p>
-
 ### Key Findings
 
 - **Sub-half-centimeter accuracy** on office0 (0.41 cm) and fr3_office (0.43 cm). Our method **beats HLoc** on fr3_office (0.43 cm vs 0.7 cm) while using a 46 MB map instead of hundreds of reference images.
@@ -142,14 +138,14 @@ We report three standard metrics from the visual localization literature:
 
 | fr3_office (0.43 cm ATE) | office0 (0.41 cm ATE) | room0 (38.5 cm ATE) |
 |:---:|:---:|:---:|
-| <img src="results/final_evaluation/figures/traj_fr3_office.png" height="250" alt="Trajectory fr3_office"> | <img src="results/final_evaluation/figures/traj_office0.png" height="250" alt="Trajectory office0"> | <img src="results/final_evaluation/figures/traj_room0.png" height="250" alt="Trajectory room0"> |
+| <img src="results/depthinit_figures/traj_fr3_office.png" height="250" alt="Trajectory fr3_office"> | <img src="results/depthinit_figures/traj_office0.png" height="250" alt="Trajectory office0"> | <img src="results/depthinit_figures/traj_room0.png" height="250" alt="Trajectory room0"> |
 | Tight tracking | Tracks then diverges | PF cannot discriminate |
 
 ### Convergence Over Time
 
 | fr3_office | office0 | room0 |
 |:---:|:---:|:---:|
-| <img src="results/final_evaluation/figures/conv_trans_fr3_office.png" height="220" alt="Convergence fr3_office"> | <img src="results/final_evaluation/figures/conv_trans_office0.png" height="220" alt="Convergence office0"> | <img src="results/final_evaluation/figures/conv_trans_room0.png" height="220" alt="Convergence room0"> |
+| <img src="results/depthinit_figures/conv_fr3_office.png" height="220" alt="Convergence fr3_office"> | <img src="results/depthinit_figures/conv_office0.png" height="220" alt="Convergence office0"> | <img src="results/depthinit_figures/conv_room0.png" height="220" alt="Convergence room0"> |
 
 *Translation error over time across observation models. Depth-initialized maps show further improvement over these depth-supervised results.*
 
