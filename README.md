@@ -28,7 +28,7 @@ This project builds a complete camera localization system inside 3DGS maps. We u
 | Map storage | Hundreds of reference images | Single 3DGS map (46 MB) | Single 3DGS map (46 MB) |
 | Handles large init error | Yes (feature matching) | No (local minima) | Yes (particle filter) |
 | Sub-cm accuracy | Yes | Yes (near GT init) | Yes (with refinement) |
-| Runtime | 7-24 s/frame | ~0.1 s/frame | ~0.15 s/frame |
+| Runtime | 7-24 s/frame | ~0.1 s/frame | ~1.2 s/frame (PF: 0.15s + Refine: 1.1s) |
 | Robust to lighting | No | Partially | Yes (with CLIP) |
 | Needs reference images | Yes | No | No |
 
@@ -121,7 +121,7 @@ We report three standard metrics from the visual localization literature:
 | **office0** | 37.9 dB | **0.41 cm / 75%** | 0.42 cm / 74% | 0.3 cm / 100% |
 | **fr3_office** | 25.0 dB | **0.43 cm / 99%** | 0.43 cm / 100% | 0.7 cm / 100% |
 | room0 | 32.3 dB | 38.5 cm / 30% | 31.7 cm / 30% | 0.2 cm / 100% |
-| room1 | 34.7 dB | 71.5 cm / 4% | -- | -- |
+| room1 | 34.7 dB | 71.5 cm / 2% | -- | -- |
 | fr1_desk | 22.4 dB | 69.1 cm / 19% | -- | -- |
 
 *Format: ATE median / success rate (5 cm / 2 deg threshold). Each result is the median of 3 independent runs. Maps trained with depth initialization + depth supervision.*
@@ -189,7 +189,7 @@ At 20 cm initial error, GSLoc succeeds only 31% of the time -- gradient descent 
 | room0 | 0.2 cm | 0.0 deg | 100% | 17 s/frame |
 | fr3_office | 0.7 cm | 0.5 deg | 100% | 24 s/frame |
 
-HLoc (SIFT + depth-backed PnP) achieves near-perfect accuracy but requires storing hundreds of reference images with depth maps. Our approach uses a single compact 3DGS checkpoint and runs 20-80x faster per frame.
+HLoc (SIFT + depth-backed PnP) achieves near-perfect accuracy but requires storing hundreds of reference images with depth maps. Our approach uses a single compact 3DGS checkpoint and runs 6-20x faster per frame.
 
 <p align="center">
   <img src="results/hloc_baseline/hloc_comparison.png" width="700" alt="HLoc comparison">
@@ -215,8 +215,8 @@ HLoc (SIFT + depth-backed PnP) achieves near-perfect accuracy but requires stori
 
 | Method | Initial Error | Final ATE |
 |--------|--------------|-----------|
-| Random init (no retrieval) | 171.0 cm | 171.0 cm (no convergence) |
-| **CLIP retrieval + PF + Refine** | 171.0 cm | **1.8 cm** |
+| Random init (no retrieval) | 171.3 cm | 171.3 cm (no convergence) |
+| **CLIP retrieval + PF + Refine** | 171.3 cm | **1.8 cm** |
 
 This is true global localization — no pose prior needed. Gradient-only methods (GSLoc) cannot do this.
 
@@ -227,7 +227,7 @@ CLIP observation models are significantly more robust than SSIM under various im
 | Perturbation | SSIM Degradation | CLIP Degradation | CLIP Advantage |
 |-------------|-----------------|-----------------|----------------|
 | Gaussian noise (sigma=0.2) | 3.6x worse | 1.1x worse | **~3x more robust** |
-| Gamma shift (0.5x/2.0x) | Up to +12.2 cm (room0) | Up to +1.8 cm (fr3_office) | More stable across scenes |
+| Gamma shift (0.5x/2.0x) | Up to +12.2 cm (room0) | Up to +1.1 cm (fr3_office) | More stable across scenes |
 
 <p align="center">
   <img src="results/lighting_ablation/lighting_robustness.png" width="48%" alt="Lighting robustness">
@@ -257,6 +257,8 @@ semantic_pf_loc/
 │   ├── observation/
 │   │   ├── base.py                Abstract observation model interface
 │   │   ├── ssim.py                SSIM (pixel-level)
+│   │   ├── ms_ssim.py             Multi-scale SSIM with temperature annealing
+│   │   ├── lpips_obs.py           LPIPS (learned perceptual, VGG features)
 │   │   ├── clip_image.py          CLIP visual features
 │   │   └── clip_text.py           CLIP text-guided (zero-shot)
 │   ├── datasets/
