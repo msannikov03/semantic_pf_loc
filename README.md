@@ -75,10 +75,10 @@ Query Image
                      │
                      v
 ┌────────────────────────────────────────────┐
-│       GRADIENT REFINEMENT (optional)       │
+│    GRADIENT REFINEMENT (optional)          │
 │                                            │
-│  Optimize se(3) perturbation via Adam      │
-│  100 iters, L1+SSIM, coarse-to-fine blur   │
+│  Refine the PF weighted-mean pose via      │
+│  Adam on se(3), L1+SSIM, coarse-to-fine    │
 └────────────────────┬───────────────────────┘
                      │
                      v
@@ -129,7 +129,7 @@ We report three standard metrics from the visual localization literature:
 
 - **Sub-half-centimeter accuracy** on office0 (0.41 cm) and fr3_office (0.43 cm). Our method **beats HLoc** on fr3_office (0.43 cm vs 0.7 cm) while using a 46 MB map instead of hundreds of reference images.
 - **Depth-initialized training** is critical: placing Gaussians at depth back-projections instead of random positions improves PSNR by 6-9 dB on Replica scenes, translating to 3.4x better localization (office0: 1.4 cm -> 0.41 cm).
-- **Gradient refinement is the decisive factor**, improving particle filter estimates by 10-100x.
+- **Gradient refinement is the decisive factor**, improving particle filter estimates by 10-50x on scenes where the PF converges.
 - **LPIPS observation model** improves room0 by 18% over SSIM (31.7 cm vs 38.5 cm) without regressing good scenes.
 - **CLIP retrieval enables true global localization** from completely unknown position (171 cm -> 1.8 cm), something gradient-only methods cannot do.
 - **CLIP models are ~3x more robust** to image perturbations (noise, blur, color jitter) than SSIM.
@@ -165,7 +165,9 @@ At 20 cm initial error, GSLoc succeeds only 31% of the time -- gradient descent 
 |:---:|:---:|
 | <img src="results/gsloc_baseline/noise_vs_ate.png" height="220" alt="GSLoc ATE vs noise"> | <img src="results/gsloc_baseline/noise_vs_success.png" height="220" alt="GSLoc success vs noise"> |
 
-### HLoc Baseline: Classical Feature Matching
+### HLoc Baseline: Classical Feature Matching (SIFT + Depth PnP)
+
+*Note: The original proposal specified SuperPoint + LightGlue + PnP. We use SIFT + FLANN + PnP-RANSAC with depth-backed 3D-2D correspondences as a simpler but still representative classical baseline.*
 
 | Scene | ATE | ARE | Success | Runtime |
 |-------|-----|-----|---------|---------|
@@ -173,7 +175,7 @@ At 20 cm initial error, GSLoc succeeds only 31% of the time -- gradient descent 
 | room0 | 0.2 cm | 0.0 deg | 100% | 17 s/frame |
 | fr3_office | 0.7 cm | 0.5 deg | 100% | 24 s/frame |
 
-HLoc (SIFT + depth-backed PnP) achieves near-perfect accuracy but requires storing hundreds of reference images with depth maps. Our approach uses a single compact 3DGS checkpoint and runs 6-20x faster per frame.
+HLoc (SIFT + depth-backed PnP) achieves near-perfect accuracy but requires storing hundreds of reference images with depth maps. Our approach uses a single compact 3DGS checkpoint and runs 6-19x faster per frame.
 
 <p align="center">
   <img src="results/hloc_baseline/hloc_comparison.png" width="700" alt="HLoc comparison">
@@ -373,6 +375,8 @@ python3 scripts/run_global_localization.py                # Global localization 
 | room0 | 23.7 dB | 41.8 cm | +8.6 dB |
 
 Depth initialization (back-projecting depth maps to 3D for Gaussian placement) is far more effective than depth supervision alone. It provides 6-9 dB PSNR improvement on Replica scenes.
+
+*Note: TUM fr2_xyz was excluded from evaluation due to insufficient map quality (17.5 dB PSNR).*
 
 ---
 
