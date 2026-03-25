@@ -53,31 +53,31 @@ SCENES = [
     {
         "name": "office0", "type": "replica",
         "path": "data/replica/office0",
-        "ckpt": "checkpoints_depth/office0.ckpt",
+        "ckpt": "checkpoints_depthinit/office0.ckpt",
         "native_w": 1200, "native_h": 680,
         "trans_std": 0.003, "rot_std": 0.002,
     },
     {
         "name": "room0", "type": "replica",
         "path": "data/replica/room0",
-        "ckpt": "checkpoints_depth/room0.ckpt",
+        "ckpt": "checkpoints_depthinit/room0.ckpt",
         "native_w": 1200, "native_h": 680,
         "trans_std": 0.003, "rot_std": 0.002,
     },
     {
         "name": "fr3_office", "type": "tum",
         "path": "data/tum/rgbd_dataset_freiburg3_long_office_household",
-        "ckpt": "checkpoints_depth/fr3_office.ckpt",
+        "ckpt": "checkpoints_depthinit/fr3_office.ckpt",
         "native_w": 640, "native_h": 480,
         "trans_std": 0.005, "rot_std": 0.003,
     },
 ]
 
-# CORRECTED PF+Refine reference values from the 3-trial final evaluation
+# CORRECTED PF+Refine reference values from depth-initialized evaluation (3-trial median)
 PF_REFINE_CORRECT = {
-    "office0":    {"ate_median_cm": 1.4, "are_median_deg": 0.3, "success_rate": 0.75},
-    "room0":      {"ate_median_cm": 41.8, "are_median_deg": 11.4, "success_rate": 0.29},
-    "fr3_office": {"ate_median_cm": 0.6, "are_median_deg": 0.7, "success_rate": 0.94},
+    "office0":    {"ate_median_cm": 0.41, "are_median_deg": 0.10, "success_rate": 0.75},
+    "room0":      {"ate_median_cm": 38.5, "are_median_deg": 10.49, "success_rate": 0.30},
+    "fr3_office": {"ate_median_cm": 0.43, "are_median_deg": 0.60, "success_rate": 0.99},
 }
 
 N_FRAMES = 100
