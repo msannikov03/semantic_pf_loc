@@ -12,3 +12,5 @@ Pillow
 plyfile
 pandas
 tensorboard
+lpips
+opencv-python
